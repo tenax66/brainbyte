@@ -11,12 +11,7 @@ import java.nio.file.Paths
 class ByteCodeCompiler {
     private val classWriter = ClassWriter(ClassWriter.COMPUTE_FRAMES)
 
-    fun run(fileName: String, code: String) {
-        val p = Paths.get("$fileName.class")
-        Files.write(p, compile(fileName, code))
-    }
-
-    private fun compile(className: String, code: String): ByteArray {
+    fun compile(className: String, code: String): ByteArray {
         classWriter.visit(
             Opcodes.V1_8, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, className,
             null, "java/lang/Object", null

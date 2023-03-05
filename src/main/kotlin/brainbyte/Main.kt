@@ -1,11 +1,13 @@
 package brainbyte
 
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 
 fun main(args: Array<String>) {
-    val bcc = ByteCodeCompiler()
-    val inputFile = File(args[0])
-    val code: String = inputFile.readText()
+    val code = File(args[0]).readText()
+    val fileName = args[1]
+    val path = Paths.get("$fileName.class")
 
-    bcc.run(args[1], code)
+    Files.write(path, ByteCodeCompiler().compile(fileName, code))
 }
