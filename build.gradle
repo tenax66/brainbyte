@@ -44,6 +44,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.ow2.asm/asm
     implementation("org.ow2.asm:asm:9.4")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+    testImplementation("org.assertj:assertj-core:3.24.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
 
