@@ -4,30 +4,21 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
-import java.io.File
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Paths
-
-fun main(args: Array<String>) {
-    val bcc = ByteCodeCompiler()
-    val inputFile = File(args[0])
-    val code: String = inputFile.readText()
-
-    bcc.run(args[1], code)
-}
 
 class ByteCodeCompiler {
     private val classWriter = ClassWriter(ClassWriter.COMPUTE_FRAMES)
 
     fun run(fileName: String, code: String) {
         val p = Paths.get("$fileName.class")
-        Files.write(p, serializeToBytes(fileName, code))
+        Files.write(p, compile(fileName, code))
     }
 
-    private fun serializeToBytes(fileName: String, code: String): ByteArray {
+    private fun compile(className: String, code: String): ByteArray {
         classWriter.visit(
-            Opcodes.V1_8, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, fileName,
+            Opcodes.V1_8, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, className,
             null, "java/lang/Object", null
         )
         addConstructor()
@@ -81,7 +72,7 @@ class ByteCodeCompiler {
         // this has index 1
         mv.visitVarInsn(Opcodes.ISTORE, 1)
 
-        compile(code.byteInputStream(), mv)
+        interpret(code.byteInputStream(), mv)
 
         mv.visitInsn(Opcodes.RETURN)
         //passing dummy values to compute the stack value frame automatically
@@ -89,7 +80,7 @@ class ByteCodeCompiler {
         mv.visitEnd()
     }
 
-    private fun compile(codeStream: InputStream, mv: MethodVisitor) {
+    private fun interpret(codeStream: InputStream, mv: MethodVisitor) {
         while (true) {
             val byte = codeStream.read()
             if (byte == -1) {
@@ -111,7 +102,7 @@ class ByteCodeCompiler {
                     mv.visitJumpInsn(Opcodes.IFEQ, loopEnd)
 
                     // process codes inside the loop recursively
-                    compile(codeStream, mv)
+                    interpret(codeStream, mv)
 
                     mv.visitLabel(loopEnd)
 
@@ -130,14 +121,14 @@ class ByteCodeCompiler {
                 }
 
                 else -> {
-                    compileNonLoopElement(Char(byte), mv)
+                    interpretNonLoopElement(Char(byte), mv)
                 }
             }
         }
     }
 
 
-    private fun compileNonLoopElement(command: Char, mv: MethodVisitor) {
+    private fun interpretNonLoopElement(command: Char, mv: MethodVisitor) {
         when (command) {
             '+' -> {
                 mv.visitVarInsn(Opcodes.ALOAD, 0)
