@@ -1,12 +1,10 @@
-package brainbyte
+package brainbyte.compiler
 
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import java.io.InputStream
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class ByteCodeCompiler {
     private val classWriter = ClassWriter(ClassWriter.COMPUTE_FRAMES)
