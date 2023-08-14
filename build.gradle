@@ -25,8 +25,8 @@ tasks.withType(JavaCompile) {
 }
 
 application {
-    mainModule = 'net.tenax66.brainbyte'
-    mainClass = 'net.tenax66.brainbyte.Main'
+    mainModule = 'brainbyte'
+    mainClass = 'brainbyte.Main'
 }
 
 [compileKotlin, compileTestKotlin].forEach {
@@ -41,6 +41,7 @@ javafx {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
     // https://mvnrepository.com/artifact/org.ow2.asm/asm
     implementation("org.ow2.asm:asm:9.4")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
@@ -62,4 +63,16 @@ jlink {
 
 jlinkZip {
     group = 'distribution'
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes 'Main-Class': "brainbyte.MainKt"
+    }
+    from {
+        configurations.compileClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
 }
